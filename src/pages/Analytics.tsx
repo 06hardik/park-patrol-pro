@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { 
   TrendingUp, 
   Calendar, 
-  DollarSign, 
+  IndianRupee, 
   AlertTriangle,
   BarChart3,
   Clock
@@ -118,8 +118,8 @@ export default function Analytics() {
               />
               <StatsCard
                 title="Total Penalties"
-                value={`$${stats.totalPenaltiesAssessed.toLocaleString()}`}
-                icon={DollarSign}
+                value={`₹${stats.totalPenaltiesAssessed.toLocaleString('en-IN')}`}
+                icon={IndianRupee}
               />
             </>
           )}
@@ -173,7 +173,7 @@ export default function Analytics() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
+                <IndianRupee className="h-5 w-5" />
                 Penalty Distribution
               </CardTitle>
             </CardHeader>
@@ -197,7 +197,7 @@ export default function Analytics() {
                       ))}
                     </Pie>
                     <Tooltip 
-                      formatter={(value: number) => [`$${value.toLocaleString()}`, 'Penalties']}
+                      formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Penalties']}
                       contentStyle={{ 
                         backgroundColor: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',

@@ -12,9 +12,8 @@ import {
   Car, 
   AlertTriangle, 
   Clock, 
-  DollarSign,
-  CheckCircle,
-  Timer
+  IndianRupee,
+  CheckCircle
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -74,7 +73,7 @@ export default function Overview() {
         <div className="data-grid">
           {statsLoading || !stats ? (
             <>
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <Skeleton key={i} className="h-28" />
               ))}
             </>
@@ -82,7 +81,7 @@ export default function Overview() {
             <>
               <StatsCard
                 title="Total Lots"
-                value={lots?.length || 8}
+                value={lots?.length || 5}
                 icon={Car}
                 variant="default"
               />
@@ -91,12 +90,6 @@ export default function Overview() {
                 value={stats.lotsInCompliance}
                 icon={CheckCircle}
                 variant="success"
-              />
-              <StatsCard
-                title="Grace Period"
-                value={stats.lotsInGracePeriod}
-                icon={Timer}
-                variant="warning"
               />
               <StatsCard
                 title="Violating"
@@ -113,9 +106,9 @@ export default function Overview() {
               />
               <StatsCard
                 title="Total Penalties (Month)"
-                value={`$${stats.totalPenaltiesAssessed.toLocaleString()}`}
+                value={`₹${stats.totalPenaltiesAssessed.toLocaleString('en-IN')}`}
                 subtitle={`${stats.violationsThisMonth} violations`}
-                icon={DollarSign}
+                icon={IndianRupee}
               />
             </>
           )}

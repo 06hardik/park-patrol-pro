@@ -1,6 +1,5 @@
 import { ParkingLotWithStatus } from '@/types/parking';
 import { StatusBadge } from './StatusBadge';
-import { Sparkline } from './Sparkline';
 import { UtilizationBar } from './UtilizationBar';
 import {
   Table,
@@ -11,7 +10,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import { Clock, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 interface ParkingLotsTableProps {
   lots: ParkingLotWithStatus[];
@@ -35,12 +34,11 @@ export function ParkingLotsTable({ lots, onLotClick, className }: ParkingLotsTab
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="font-semibold">Lot Name</TableHead>
-            <TableHead className="font-semibold">Contractor</TableHead>
+            <TableHead className="font-semibold">Operator</TableHead>
             <TableHead className="font-semibold text-center">Capacity</TableHead>
             <TableHead className="font-semibold text-center">Current</TableHead>
             <TableHead className="font-semibold w-[180px]">Utilization</TableHead>
             <TableHead className="font-semibold text-center">Status</TableHead>
-            <TableHead className="font-semibold text-center">Trend (24h)</TableHead>
             <TableHead className="font-semibold text-right">Violation</TableHead>
           </TableRow>
         </TableHeader>
@@ -50,8 +48,7 @@ export function ParkingLotsTable({ lots, onLotClick, className }: ParkingLotsTab
               key={lot.id}
               className={cn(
                 'cursor-pointer transition-colors',
-                lot.status === 'violating' && 'bg-status-violating/5 hover:bg-status-violating/10',
-                lot.status === 'grace_period' && 'bg-status-grace/5 hover:bg-status-grace/10'
+                lot.status === 'violating' && 'bg-status-violating/5 hover:bg-status-violating/10'
               )}
               onClick={() => onLotClick?.(lot.id)}
             >
@@ -82,36 +79,13 @@ export function ParkingLotsTable({ lots, onLotClick, className }: ParkingLotsTab
                   size="sm"
                 />
               </TableCell>
-              <TableCell className="text-center">
-                <Sparkline 
-                  data={lot.countHistory} 
-                  threshold={lot.allowedCapacity}
-                  width={100}
-                  height={28}
-                />
-              </TableCell>
               <TableCell className="text-right">
                 {lot.activeViolation ? (
                   <div className="flex items-center justify-end gap-2 text-sm">
-                    {lot.activeViolation.isInGracePeriod ? (
-                      <>
-                        <Clock className="h-4 w-4 text-status-grace" />
-                        <span className="font-mono text-status-grace">
-                          Grace: {formatDuration(
-                            Math.max(0, Math.ceil(
-                              (lot.activeViolation.graceExpiresAt.getTime() - Date.now()) / 60000
-                            ))
-                          )}
-                        </span>
-                      </>
-                    ) : (
-                      <>
-                        <AlertTriangle className="h-4 w-4 text-status-violating" />
-                        <span className="font-mono text-status-violating">
-                          {formatDuration(lot.activeViolation.durationMinutes)}
-                        </span>
-                      </>
-                    )}
+                    <AlertTriangle className="h-4 w-4 text-status-violating" />
+                    <span className="font-mono text-status-violating">
+                      {formatDuration(lot.activeViolation.durationMinutes)}
+                    </span>
                   </div>
                 ) : (
                   <span className="text-muted-foreground">—</span>
