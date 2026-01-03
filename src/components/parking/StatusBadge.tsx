@@ -13,10 +13,6 @@ const statusConfig: Record<ComplianceStatus, { label: string; className: string 
     label: 'Compliant',
     className: 'bg-status-compliant text-status-compliant-foreground',
   },
-  grace_period: {
-    label: 'Grace Period',
-    className: 'bg-status-grace text-status-grace-foreground',
-  },
   violating: {
     label: 'Violating',
     className: 'bg-status-violating text-status-violating-foreground',

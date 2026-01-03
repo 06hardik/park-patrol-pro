@@ -47,12 +47,10 @@ export const parkingService = {
         const utilization = (lot.currentCount / lot.allowedCapacity) * 100;
         const activeViolation = simulatedViolations.find(v => v.lotId === lot.id && v.status === 'active');
         
+        // No grace period - immediately violating if over capacity
         let status: ParkingLotWithStatus['status'] = 'compliant';
-        if (activeViolation) {
-          const graceExpired = new Date(activeViolation.startedAt.getTime() + lot.gracePeriodMinutes * 60 * 1000) < new Date();
-          status = graceExpired ? 'violating' : 'grace_period';
-        } else if (lot.currentCount > lot.allowedCapacity) {
-          status = 'grace_period';
+        if (activeViolation || lot.currentCount > lot.allowedCapacity) {
+          status = 'violating';
         }
         
         // Generate count history
@@ -74,11 +72,9 @@ export const parkingService = {
             id: activeViolation.id,
             lotId: lot.id,
             startedAt: activeViolation.startedAt,
-            graceExpiresAt: new Date(activeViolation.startedAt.getTime() + lot.gracePeriodMinutes * 60 * 1000),
             maxExcess: activeViolation.maxExcess,
             currentExcess: Math.max(0, lot.currentCount - lot.allowedCapacity),
             durationMinutes: Math.floor((Date.now() - activeViolation.startedAt.getTime()) / 60000),
-            isInGracePeriod: status === 'grace_period',
           } : undefined,
           countHistory,
         };
@@ -125,18 +121,14 @@ export const parkingService = {
       const activeCount = simulatedViolations.filter(v => v.status === 'active').length;
       const lotsData = simulatedLots.map(lot => {
         const activeViolation = simulatedViolations.find(v => v.lotId === lot.id && v.status === 'active');
-        if (activeViolation) {
-          const graceExpired = new Date(activeViolation.startedAt.getTime() + lot.gracePeriodMinutes * 60 * 1000) < new Date();
-          return graceExpired ? 'violating' : 'grace_period';
-        }
-        return lot.currentCount > lot.allowedCapacity ? 'grace_period' : 'compliant';
+        // No grace period check
+        return (activeViolation || lot.currentCount > lot.allowedCapacity) ? 'violating' : 'compliant';
       });
       
       return {
         ...aggregateStats,
         activeViolations: activeCount,
         lotsInCompliance: lotsData.filter(s => s === 'compliant').length,
-        lotsInGracePeriod: lotsData.filter(s => s === 'grace_period').length,
         lotsViolating: lotsData.filter(s => s === 'violating').length,
       };
     }
@@ -155,7 +147,7 @@ export const parkingService = {
     return { ...simulationState };
   },
 
-  // Start simulation
+  // Start simulation - Only Rush Hour scenario
   async startSimulation(scenario: SimulationScenario): Promise<SimulationState> {
     await new Promise(resolve => setTimeout(resolve, 200));
     
@@ -168,43 +160,11 @@ export const parkingService = {
       eventsGenerated: 0,
     };
     
-    // Apply scenario effects
-    switch (scenario) {
-      case 'rush_hour':
-        // Increase counts across all lots
-        simulatedLots = simulatedLots.map(lot => ({
-          ...lot,
-          currentCount: Math.min(
-            Math.round(lot.allowedCapacity * (0.85 + Math.random() * 0.3)),
-            Math.round(lot.allowedCapacity * 1.2)
-          ),
-        }));
-        break;
-        
-      case 'overnight':
-        // Decrease counts
-        simulatedLots = simulatedLots.map(lot => ({
-          ...lot,
-          currentCount: Math.round(lot.allowedCapacity * (0.1 + Math.random() * 0.2)),
-        }));
-        break;
-        
-      case 'weekend':
-        // Moderate counts
-        simulatedLots = simulatedLots.map(lot => ({
-          ...lot,
-          currentCount: Math.round(lot.allowedCapacity * (0.4 + Math.random() * 0.3)),
-        }));
-        break;
-        
-      case 'stress_test':
-        // Push all near or over capacity
-        simulatedLots = simulatedLots.map(lot => ({
-          ...lot,
-          currentCount: Math.round(lot.allowedCapacity * (0.95 + Math.random() * 0.2)),
-        }));
-        break;
-    }
+    // Rush Hour: Push multiple lots over capacity immediately
+    simulatedLots = simulatedLots.map(lot => ({
+      ...lot,
+      currentCount: Math.round(lot.allowedCapacity * (0.95 + Math.random() * 0.25)),
+    }));
     
     return { ...simulationState };
   },
@@ -231,30 +191,12 @@ export const parkingService = {
     
     simulationState.eventsGenerated++;
     
-    // Randomly adjust counts
+    // Rush hour: bias toward increase to push lots over capacity
     simulatedLots = simulatedLots.map(lot => {
-      let delta = 0;
-      
-      switch (simulationState.scenario) {
-        case 'rush_hour':
-          delta = Math.round(Math.random() * 10 - 4); // Bias toward increase
-          break;
-        case 'overnight':
-          delta = Math.round(Math.random() * 4 - 3); // Bias toward decrease
-          break;
-        case 'weekend':
-          delta = Math.round(Math.random() * 6 - 3); // Neutral
-          break;
-        case 'stress_test':
-          delta = Math.round(Math.random() * 8 - 2); // Bias toward increase
-          break;
-        default:
-          delta = Math.round(Math.random() * 4 - 2);
-      }
-      
+      const delta = Math.round(Math.random() * 12 - 4); // Bias toward increase
       const newCount = Math.max(0, lot.currentCount + delta);
       
-      // Create violation if over capacity and not already violating
+      // Create violation immediately if over capacity (no grace period)
       if (newCount > lot.allowedCapacity) {
         const existingViolation = simulatedViolations.find(
           v => v.lotId === lot.id && v.status === 'active'

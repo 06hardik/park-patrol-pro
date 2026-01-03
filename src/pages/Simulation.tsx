@@ -5,6 +5,7 @@ import { SimulationControl } from '@/components/parking/SimulationControl';
 import { ParkingLotsTable } from '@/components/parking/ParkingLotsTable';
 import { ViolationsTable } from '@/components/parking/ViolationsTable';
 import { PollingIndicator } from '@/components/parking/PollingIndicator';
+import { CongestionHeatmap } from '@/components/parking/CongestionHeatmap';
 import { usePolling } from '@/hooks/usePolling';
 import { parkingService } from '@/services/parkingService';
 import { SimulationState, SimulationScenario, ParkingLotWithStatus, Violation } from '@/types/parking';
@@ -60,7 +61,7 @@ export default function Simulation() {
       setSimState(newState);
       toast({
         title: 'Simulation Started',
-        description: `Running ${scenario.replace('_', ' ')} scenario`,
+        description: 'Running Rush Hour scenario - high traffic patterns',
       });
       refetchLots();
       refetchViolations();
@@ -95,13 +96,13 @@ export default function Simulation() {
     }
   }, [toast]);
 
-  const activeLots = lots?.filter(l => l.status !== 'compliant').length || 0;
+  const activeLots = lots?.filter(l => l.status === 'violating').length || 0;
 
   return (
     <DashboardLayout>
       <Header 
         title="Simulation" 
-        subtitle="Test scenarios and observe system behavior"
+        subtitle="Test Rush Hour scenario and observe system behavior"
         actions={
           simState.isRunning && (
             <PollingIndicator 
@@ -135,7 +136,7 @@ export default function Simulation() {
               {!simState.isRunning ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Activity className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Start a simulation to see live statistics</p>
+                  <p>Start Rush Hour simulation to see live statistics</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-3 gap-4">
@@ -149,7 +150,7 @@ export default function Simulation() {
                     <p className="text-2xl font-bold font-mono text-status-violating">
                       {activeLots}
                     </p>
-                    <p className="text-sm text-muted-foreground">Active Issues</p>
+                    <p className="text-sm text-muted-foreground">Violating</p>
                   </div>
                   <div className="text-center p-4 rounded-lg bg-primary/10">
                     <Activity className="h-6 w-6 mx-auto mb-2 text-primary" />
@@ -161,6 +162,11 @@ export default function Simulation() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Congestion Heatmap */}
+        {simState.isRunning && lots && (
+          <CongestionHeatmap lots={lots} />
+        )}
 
         {/* Live Lots Table */}
         {simState.isRunning && (
@@ -206,7 +212,7 @@ export default function Simulation() {
               <Activity className="h-16 w-16 mx-auto text-muted-foreground/30 mb-4" />
               <h3 className="text-lg font-medium mb-2">No Active Simulation</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
-                Select a scenario from the control panel to start simulating parking lot activity. 
+                Start the Rush Hour scenario from the control panel to simulate heavy parking lot activity. 
                 Watch as vehicle counts change and violations are detected in real-time.
               </p>
             </CardContent>

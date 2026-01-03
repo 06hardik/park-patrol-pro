@@ -15,7 +15,7 @@ import {
   Camera, 
   Hash, 
   MapPin, 
-  DollarSign,
+  IndianRupee,
   TrendingUp,
   FileText,
   Copy,
@@ -34,9 +34,9 @@ function formatDuration(minutes: number): string {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -261,7 +261,7 @@ export default function ViolationDetail() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
+                <IndianRupee className="h-5 w-5" />
                 Penalty Calculation
               </CardTitle>
             </CardHeader>

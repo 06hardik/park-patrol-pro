@@ -1,4 +1,4 @@
-export type ComplianceStatus = 'compliant' | 'grace_period' | 'violating';
+export type ComplianceStatus = 'compliant' | 'violating';
 
 export interface ParkingLot {
   id: string;
@@ -6,8 +6,9 @@ export interface ParkingLot {
   contractor: string;
   allowedCapacity: number;
   currentCount: number;
-  gracePeriodMinutes: number;
   penaltyRatePerHour: number;
+  latitude: number;
+  longitude: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,11 +29,9 @@ export interface ActiveViolation {
   id: string;
   lotId: string;
   startedAt: Date;
-  graceExpiresAt: Date;
   maxExcess: number;
   currentExcess: number;
   durationMinutes: number;
-  isInGracePeriod: boolean;
 }
 
 export interface Violation {
@@ -70,7 +69,6 @@ export interface ContractRule {
   lotId: string;
   version: string;
   allowedCapacity: number;
-  gracePeriodMinutes: number;
   penaltyRatePerHour: number;
   effectiveFrom: Date;
   effectiveTo: Date | null;
@@ -99,7 +97,6 @@ export interface AggregateStats {
   totalPenaltiesAssessed: number;
   activeViolations: number;
   lotsInCompliance: number;
-  lotsInGracePeriod: number;
   lotsViolating: number;
 }
 
@@ -116,7 +113,7 @@ export interface SimulationState {
   eventsGenerated: number;
 }
 
-export type SimulationScenario = 'rush_hour' | 'overnight' | 'weekend' | 'stress_test';
+export type SimulationScenario = 'rush_hour';
 
 export interface SimulationScenarioConfig {
   id: SimulationScenario;

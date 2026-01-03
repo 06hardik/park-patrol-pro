@@ -29,9 +29,9 @@ function formatDuration(minutes: number): string {
 }
 
 function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'INR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -58,7 +58,7 @@ export function ViolationsTable({
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
             <TableHead className="font-semibold">Lot</TableHead>
-            {!compact && <TableHead className="font-semibold">Contractor</TableHead>}
+            {!compact && <TableHead className="font-semibold">Operator</TableHead>}
             <TableHead className="font-semibold">Started</TableHead>
             <TableHead className="font-semibold text-center">Duration</TableHead>
             <TableHead className="font-semibold text-center">Max Excess</TableHead>

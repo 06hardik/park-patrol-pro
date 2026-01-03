@@ -17,8 +17,6 @@ export function UtilizationBar({ utilization, status, showLabel = true, classNam
     switch (status) {
       case 'compliant':
         return 'bg-status-compliant';
-      case 'grace_period':
-        return 'bg-status-grace';
       case 'violating':
         return 'bg-status-violating';
     }

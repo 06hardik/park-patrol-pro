@@ -77,25 +77,25 @@ export function SimulationControl({
       ) : (
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Select a scenario to simulate different traffic patterns:
+            Start Rush Hour simulation to test high traffic patterns:
           </p>
           
-          <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-2">
             {scenarioConfigs.map(config => (
               <Button
                 key={config.id}
                 variant="outline"
                 onClick={() => onStart(config.id)}
                 disabled={isLoading}
-                className="h-auto py-3 px-4 flex flex-col items-start gap-1 hover:bg-primary/10 hover:border-primary"
+                className="w-full h-auto py-3 px-4 flex items-start gap-3 hover:bg-primary/10 hover:border-primary"
               >
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{config.icon}</span>
+                <span className="text-2xl">{config.icon}</span>
+                <div className="flex flex-col items-start gap-1">
                   <span className="font-medium">{config.name}</span>
+                  <span className="text-xs text-muted-foreground text-left font-normal">
+                    {config.description}
+                  </span>
                 </div>
-                <span className="text-xs text-muted-foreground text-left font-normal">
-                  {config.description}
-                </span>
               </Button>
             ))}
           </div>
